@@ -98,6 +98,20 @@
         "AI"
       ],
       "minVersion": "4.14.0"
+    },
+    {
+      "id": "napcat-plugin-auto-clear",
+      "name": "自动清理",
+      "version": "1.0.0",
+      "description": "定时扫描并清理长期不发言的鱼干成员",
+      "author": "AQiaoYo",
+      "homepage": "https://github.com/AQiaoYo/napcat-plugin-auto-clear",
+      "downloadUrl": "https://github.com/AQiaoYo/napcat-plugin-auto-clear/releases/download/Latest/napcat-plugin-auto-clear.zip",
+      "tags": [
+        "工具",
+        "管理"
+      ],
+      "minVersion": "4.14.0"
     }
   ]
 }
