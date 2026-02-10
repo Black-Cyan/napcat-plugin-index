@@ -1,6 +1,6 @@
 {
   "version": "1.0.0",
-  "updateTime": "2026-02-10T14:23:28Z",
+  "updateTime": "2026-02-10T14:34:06Z",
   "plugins": [
     {
       "id": "napcat-plugin-builtin",
@@ -387,6 +387,19 @@
         "工具",
         "邮件",
         "SMTP"
+      ],
+      "minVersion": "4.14.0"
+    },
+    {
+      "id": "napcat-plugin-auto-to-like",
+      "name": "自动回赞",
+      "version": "1.0.0",
+      "description": "这是一个自动回赞插件",
+      "author": "Chace",
+      "homepage": "https://github.com/ChaceQC/napcat-plugin-auto-to-like",
+      "downloadUrl": "https://github.com/ChaceQC/napcat-plugin-auto-to-like/releases/download/v1.0.0/napcat-plugin-auto-to-like.zip",
+      "tags": [
+        "娱乐"
       ],
       "minVersion": "4.14.0"
     }
