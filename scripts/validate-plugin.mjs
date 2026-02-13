@@ -391,7 +391,28 @@ async function main() {
         process.exit(1);
     }
 
-    // 2. 顶层结构校验
+    // 2. Diff 模式下提示不要修改 updateTime（以 merge-base 为准），避免 PR 冲突
+    if (isDiff && baseRef) {
+        try {
+            let baseTarget = baseRef;
+            try {
+                const mergeBase = execSync(`git merge-base HEAD ${baseRef}`, { encoding: 'utf-8' }).trim();
+                if (mergeBase) baseTarget = mergeBase;
+            } catch { }
+
+            const baseContent = execSync(`git show ${baseTarget}:plugins.v4.json`, { encoding: 'utf-8' });
+            const baseData = JSON.parse(baseContent);
+            if (baseData.updateTime) {
+                if (data.updateTime !== baseData.updateTime) {
+                    logWarn('root', `updateTime 请不要在 PR 中修改（merge-base: ${baseData.updateTime}, current: ${data.updateTime || '缺失'}），由仓库 CI 在合并后自动更新`);
+                }
+            }
+        } catch (err) {
+            logWarn('root', `无法读取 base 的 updateTime: ${err.message}`);
+        }
+    }
+
+    // 3. 顶层结构校验
     if (!data.version) logWarn('root', '缺少 version 字段');
     if (!data.updateTime) logWarn('root', '缺少 updateTime 字段');
     if (!Array.isArray(data.plugins)) {
@@ -401,33 +422,18 @@ async function main() {
 
     logInfo(`共 ${data.plugins.length} 个插件`);
 
-    // 2.1 Diff 模式下提示不要修改 updateTime，避免 PR 冲突
-    if (isDiff && baseRef) {
-        try {
-            const baseContent = execSync(`git show ${baseRef}:plugins.v4.json`, { encoding: 'utf-8' });
-            const baseData = JSON.parse(baseContent);
-            if (baseData.updateTime) {
-                if (data.updateTime !== baseData.updateTime) {
-                    logWarn('root', `updateTime 请不要在 PR 中修改（base: ${baseData.updateTime}, current: ${data.updateTime || '缺失'}），由仓库 CI 在合并后自动更新`);
-                }
-            }
-        } catch (err) {
-            logWarn('root', `无法读取 base 的 updateTime: ${err.message}`);
-        }
-    }
-
-    // 3. 字段校验
+    // 4. 字段校验
     console.log(colors.bold('\n📋 字段校验'));
     for (let i = 0; i < data.plugins.length; i++) {
         validatePluginFields(data.plugins[i], i);
     }
 
-    // 4. ID 唯一性
+    // 5. ID 唯一性
     console.log(colors.bold('\n🔑 ID 唯一性'));
     validateUniqueIds(data.plugins);
     if (errorCount === 0) logOk('所有插件 ID 唯一');
 
-    // 5. Diff 模式：显示变更
+    // 6. Diff 模式：显示变更
     if (isDiff && baseRef) {
         console.log(colors.bold(`\n📊 变更检测 (对比 ${baseRef})`));
         const diff = getDiffPlugins(baseRef);
@@ -467,7 +473,7 @@ async function main() {
         }
     }
 
-    // 6. 链接检查
+    // 7. 链接检查
     if (isCheckLinks || isDiff) {
         console.log(colors.bold('\n🔗 链接可达性检查'));
 
@@ -519,7 +525,7 @@ async function main() {
         }
     }
 
-    // 7. 输出结果
+    // 8. 输出结果
     console.log(colors.bold('\n📊 校验结果'));
     if (errorCount > 0) {
         console.error(colors.red(`  ❌ ${errorCount} 个错误, ${warnCount} 个警告`));
